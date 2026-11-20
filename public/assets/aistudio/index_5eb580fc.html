@@ -1,0 +1,243 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Daniel & Marceline Invitation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ballet:opsz@16..72&family=Inter:wght@400&family=Tenor+Sans&display=swap">
+<style>
+  /* Layout: the paper and the corner artwork fill the whole screen (artwork pinned to the four screen
+     corners). The invitation text lives in a 1240 x 1748 px content box (the original canvas, every
+     element placed by measured pixel coordinates) that is scaled to fit and centred, so it never crops or
+     distorts on any screen shape.
+     Motion: paper fades in and breathes, corner artwork drifts in from its corner then sways in
+     staggered gusts, text reveals line by line (soft rise for sans, left-to-right write-on for script). */
+  :root {
+    --page: #f7f1eb;
+    --ink: #434634;
+    --sage: #7a8e74;
+    --green: #546b57;
+    --gold: #bf9042;
+    --black: #000000;
+    --f-sans: "Tenor Sans", "Jost", "Helvetica Neue", Arial, sans-serif;
+    --f-addr: "Inter", "Helvetica Neue", Arial, sans-serif;
+    --f-script: "Ballet", "Pinyon Script", "Snell Roundhand", cursive;
+    --ease-out: cubic-bezier(.19, .72, .2, 1);
+    --ease-soft: cubic-bezier(.45, 0, .2, 1);
+  }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--page); overflow: hidden; }
+  .card { position: relative; width: 100%; height: 100%; min-height: 520px; overflow: hidden; background: var(--page); cursor: pointer; --cs: 1; }
+  .card img { position: absolute; display: block; max-width: none; user-select: none; -webkit-user-drag: none; }
+  .paper { left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; transform-origin: 50% 50%; }
+  .glow {
+    position: absolute; left: -20%; top: -20%; width: 140%; height: 140%; pointer-events: none;
+    background: radial-gradient(closest-side at 50% 50%, rgba(255, 252, 245, .62), rgba(255, 252, 245, 0) 100%);
+    background-size: 62% 48%; background-repeat: no-repeat; background-position: 30% 28%;
+    opacity: 0;
+  }
+  .asset { position: absolute; width: calc(var(--w) * var(--cs)); height: calc(var(--h) * var(--cs)); will-change: transform; }
+  .asset img { left: 0; top: 0; width: 100%; height: 100%; will-change: transform; transform-origin: inherit; }
+  .a-tl { left: 0;  top: 0;    --w: 299px; --h: 495px; transform-origin: 0 0;       --fx: -70px; --fy: -48px; --fr: -5deg; --a: -1.25deg; --dur: 9s;    --sd: 2.6s; --id: .10s; }
+  .a-tr { right: 0; top: 0;    --w: 542px; --h: 568px; transform-origin: 100% 0;    --fx:  70px; --fy: -48px; --fr:  5deg; --a: -.7deg;   --dur: 11s;   --sd: 3.4s; --id: .26s; }
+  .a-bl { left: 0;  bottom: 0; --w: 539px; --h: 569px; transform-origin: 0 100%;    --fx: -70px; --fy:  56px; --fr:  4deg; --a:  .7deg;   --dur: 10s;   --sd: 3.0s; --id: .42s; }
+  .a-br { right: 0; bottom: 0; --w: 354px; --h: 491px; transform-origin: 100% 100%; --fx:  70px; --fy:  56px; --fr: -4deg; --a:  1.25deg; --dur: 12.5s; --sd: 3.8s; --id: .58s; }
+
+  .content { position: absolute; left: 0; top: 0; width: 1240px; height: 1748px; transform-origin: 0 0; }
+  .content img { position: absolute; }
+  .bar { position: absolute; width: 7px; height: 145px; top: 1091px; background: var(--gold); transform-origin: 50% 50%; }
+  .t { position: absolute; margin: 0; white-space: pre; line-height: 1; visibility: hidden; font-kerning: normal; }
+  .t.ready { visibility: visible; }
+  .strut { display: inline-block; width: 0; height: 0; }
+
+  /* hidden start states, only while the opening is armed (the script adds .pre) */
+  .card.pre .paper, .card.pre .asset, .card.pre .a-up, .card.pre .a-wipe, .card.pre .a-pop, .card.pre .a-grow { opacity: 0; }
+
+  /* opening sequence */
+  .card.go .paper { animation: paperIn 1.8s var(--ease-soft) both, breathe 26s ease-in-out 1.8s infinite alternate; }
+  .card.go .glow  { animation: glowIn 2.4s ease-out .4s both, glowDrift 22s ease-in-out 2.8s infinite alternate; }
+  .card.go .asset { animation: assetIn 2.2s var(--ease-out) var(--id) both; }
+  .card.go .asset img { animation: sway var(--dur) ease-in-out var(--sd) infinite; }
+  .card.go .a-up   { animation: rise 1.25s var(--ease-out) var(--d, 0s) both; }
+  .card.go .a-wipe { animation: wipe var(--t, 1.8s) cubic-bezier(.5, .05, .25, 1) var(--d, 0s) both; }
+  .card.go .a-pop  { animation: pop 1.1s var(--ease-out) var(--d, 0s) both; }
+  .card.go .a-grow { animation: grow 1s var(--ease-out) var(--d, 0s) both; }
+
+  @keyframes paperIn { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: scale(1); } }
+  @keyframes breathe { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.03) translate(-6px, 4px); } }
+  @keyframes glowIn { from { opacity: 0; } to { opacity: .55; } }
+  @keyframes glowDrift {
+    from { background-position: 24% 22%; opacity: .55; }
+    50%  { opacity: .32; }
+    to   { background-position: 76% 74%; opacity: .55; }
+  }
+  @keyframes assetIn {
+    from { opacity: 0; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(1.07); }
+    55%  { opacity: 1; }
+    to   { opacity: 1; transform: none; }
+  }
+  /* a gust: lean in, overshoot back, settle (rest at both ends so the loop is seamless) */
+  @keyframes sway {
+    0%, 100% { transform: rotate(0deg); }
+    14% { transform: rotate(calc(var(--a) * .5)); }
+    28% { transform: rotate(var(--a)); }
+    44% { transform: rotate(calc(var(--a) * -.38)); }
+    58% { transform: rotate(calc(var(--a) * .22)); }
+    74% { transform: rotate(calc(var(--a) * -.08)); }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px); filter: blur(5px); }
+    to   { opacity: 1; transform: none; filter: blur(0); }
+  }
+  @keyframes wipe {
+    from { opacity: 1; clip-path: inset(-70% 102% -70% -30%); }
+    to   { opacity: 1; clip-path: inset(-70% -30% -70% -30%); }
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(.86); filter: blur(4px); }
+    to   { opacity: 1; transform: none; filter: blur(0); }
+  }
+  @keyframes grow { from { opacity: 1; transform: scaleY(0); } to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card.pre .paper, .card.pre .asset, .card.pre .a-up, .card.pre .a-wipe, .card.pre .a-pop, .card.pre .a-grow { opacity: 1; }
+    .card .paper, .card .glow, .card .asset, .card .asset img, .card .a-up, .card .a-wipe, .card .a-pop, .card .a-grow { animation: none !important; }
+  }
+</style>
+
+<main class="card pre" id="card" aria-label="Wedding invitation for Daniel and Marceline, Saturday 14 December 2024 at 7:00 PM">
+  <img class="paper" src="assets/paper.jpg" alt="">
+  <div class="glow"></div>
+  <div class="asset a-tl"><img src="assets/leaf-tl.png" alt=""></div>
+  <div class="asset a-tr"><img src="assets/flower-tr.png" alt=""></div>
+  <div class="asset a-bl"><img src="assets/flower-bl.png" alt=""></div>
+  <div class="asset a-br"><img src="assets/leaf-br.png" alt=""></div>
+  <div class="content" id="content">
+    <img class="a-up" src="assets/bismillah.png" alt="Bismillah ir-Rahman ir-Rahim" style="left:464px;top:226px;width:311px;height:74px;--d:.9s">
+    <div class="bar a-grow" style="left:505px;--d:3.7s"></div>
+    <div class="bar a-grow" style="left:728px;--d:3.7s"></div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var W = 1240, H = 1748, GUTTER = 16;
+  var SANS = "var(--f-sans)", ADDR = "var(--f-addr)", SCRIPT = "var(--f-script)";
+  var cs = getComputedStyle(document.documentElement);
+  function fam(v) { return cs.getPropertyValue(v.slice(4, -1)).trim(); }
+
+  /* l / r = left and right edge of the ink, base = baseline y, cap = cap (or digit) height,
+     cy = vertical centre of the ink (script lines). All measured from the 1240 x 1748 original.
+     a = reveal style, d = start delay in seconds, dur = duration for write-on lines. */
+  var LINES = [
+    { t: "You Are Invited To", f: SANS, c: "--ink", l: 412, r: 827, base: 408, cap: 30, ref: "H", a: "up", d: 1.5 },
+    { t: "The Wedding Of", f: SANS, c: "--ink", l: 440, r: 801, base: 470, cap: 30, ref: "H", a: "up", d: 1.7 },
+    { t: "Daniel", f: SCRIPT, c: "--ink", l: 433, r: 804, cy: 621, script: 1, a: "wipe", d: 2.3, dur: 1.9 },
+    { t: "&", f: SANS, c: "--sage", l: 597, r: 644, base: 775, cap: 50, ref: "&", a: "pop", d: 3.0 },
+    { t: "Marceline", f: SCRIPT, c: "--ink", l: 378, r: 866, cy: 861, script: 1, a: "wipe", d: 3.1, dur: 2.2 },
+    { t: "DECEMBER", f: SANS, c: "--ink", l: 513, r: 729, base: 1055, cap: 26, ref: "H", a: "up", d: 3.9 },
+    { t: "SATURDAY", f: SANS, c: "--ink", l: 196, r: 434, base: 1168, cap: 27, ref: "H", a: "up", d: 4.15 },
+    { t: "14", f: SANS, c: "--green", l: 548, r: 696, base: 1207, cap: 98, ref: "14", a: "pop", d: 4.0 },
+    { t: "AT 07:00 PM", f: SANS, c: "--ink", l: 794, r: 1056, base: 1168, cap: 27, ref: "H", a: "up", d: 4.3 },
+    { t: "2024", f: SANS, c: "--ink", l: 547, r: 694, base: 1306, cap: 37, ref: "2024", a: "up", d: 4.5 },
+    { t: "123 Anywhere St., Any City,", f: ADDR, c: "--black", l: 367, r: 877, base: 1398, cap: 26, ref: "H", a: "up", d: 4.8 },
+    { t: "ST 12345", f: ADDR, c: "--black", l: 527, r: 713, base: 1447, cap: 26, ref: "H", a: "up", d: 4.95 },
+    { t: "Reception to follow", f: SCRIPT, c: "--ink", l: 409, r: 848, cy: 1529.5, script: 1, a: "wipe", d: 5.3, dur: 2.0 }
+  ];
+
+  var card = document.getElementById("card"), content = document.getElementById("content");
+  var ctx = document.createElement("canvas").getContext("2d");
+
+  function ink(font, text) {
+    ctx.font = font;
+    var m = ctx.measureText(text);
+    return { l: m.actualBoundingBoxLeft, r: m.actualBoundingBoxRight, a: m.actualBoundingBoxAscent, d: m.actualBoundingBoxDescent };
+  }
+
+  function place(L) {
+    var family = fam(L.f);
+    var el = document.createElement("div");
+    el.className = "t a-" + L.a;
+    el.style.fontFamily = family;
+    el.style.color = cs.getPropertyValue(L.c).trim();
+    el.style.setProperty("--d", L.d + "s");
+    if (L.dur) el.style.setProperty("--t", L.dur + "s");
+    el.textContent = L.t;
+    var strut = document.createElement("span");
+    strut.className = "strut";
+    el.appendChild(strut);
+    content.appendChild(el);
+
+    var fs, ls = 0, base;
+    if (L.script) {
+      var w100 = ink("100px " + family, L.t);
+      fs = (L.r - L.l) / (w100.l + w100.r) * 100;
+      var m = ink(fs + "px " + family, L.t);
+      base = L.cy + (m.a - m.d) / 2;
+    } else {
+      var ref = ink("200px " + family, L.ref);
+      fs = L.cap / ref.a * 200;
+      var m0 = ink(fs + "px " + family, L.t);
+      var n = L.t.length;
+      ls = n > 1 ? ((L.r - L.l) - (m0.l + m0.r)) / (n - 1) : 0;
+      base = L.base;
+    }
+    var mm = ink(fs + "px " + family, L.t);
+    el.style.fontSize = fs + "px";
+    el.style.letterSpacing = ls + "px";
+    el.style.left = (L.l + mm.l) + "px";
+    el.style.top = "0px";
+    var off = strut.getBoundingClientRect().bottom - el.getBoundingClientRect().top;
+    el.style.top = (base - off) + "px";
+    el.classList.add("ready");
+  }
+
+  /* Fit: the text block scales to the largest size that fits the screen (keeping a 16px side gutter)
+     and stays centred. The corner artwork is scaled with it, and grows a little more on very wide
+     screens so the corners keep their weight, but never enough to reach the text. */
+  function layout() {
+    var vw = card.clientWidth, vh = card.clientHeight;
+    var s = Math.min((vw - GUTTER * 2) / W, vh / H);
+    var surplus = vw / (W * s);
+    var boost = Math.min(1.5, 1 + (surplus - 1) * 0.5);
+    content.style.left = ((vw - W * s) / 2) + "px";
+    content.style.top = ((vh - H * s) / 2) + "px";
+    content.style.transform = "scale(" + s + ")";
+    card.style.setProperty("--cs", (s * boost).toFixed(4));
+  }
+
+  function start() {
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        card.classList.remove("pre");
+        card.classList.add("go");
+      });
+    });
+  }
+
+  function replay() {
+    card.classList.remove("go");
+    card.classList.add("pre");
+    void card.offsetWidth;
+    start();
+  }
+
+  var built = false;
+  function build() {
+    if (built) return; built = true;
+    content.style.transform = "none";
+    LINES.forEach(place);
+    layout();
+    start();
+  }
+
+  layout();
+  var loads = ["100px 'Tenor Sans'", "100px 'Ballet'", "100px 'Inter'"].map(function (f) {
+    return document.fonts.load(f, "AaH14&").catch(function () {});
+  });
+  Promise.all(loads).then(function () { return document.fonts.ready; }).then(build);
+  setTimeout(build, 2500);
+  window.addEventListener("resize", layout);
+  card.addEventListener("click", replay);
+})();
+</script>
+
+</body></html>
