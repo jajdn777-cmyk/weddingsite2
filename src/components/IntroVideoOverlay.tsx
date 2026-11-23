@@ -39,9 +39,16 @@ export function IntroVideoOverlay({
     setPhase('playing');
     try {
       video.currentTime = 0;
+      video.muted = false;
+      video.volume = 1;
       await video.play();
     } catch {
-      beginReveal();
+      try {
+        video.muted = true;
+        await video.play();
+      } catch {
+        beginReveal();
+      }
     }
   };
 
@@ -62,7 +69,7 @@ export function IntroVideoOverlay({
           animate={{ opacity: phase === 'blooming' ? 0 : 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed inset-0 z-50 flex h-[100dvh] w-full items-center justify-center overflow-hidden bg-[#F7F1EB]"
+          className="fixed inset-0 z-50 h-dvh w-full overflow-hidden bg-[#EAE3D7]"
           data-testid="intro-video-overlay"
         >
           {/* Fullscreen click/tap surface with ZERO text overlay, matching the clean envelope experience */}
@@ -70,17 +77,18 @@ export function IntroVideoOverlay({
             type="button"
             onClick={handleTapToOpen}
             aria-label="باز کردن کارت دعوت"
-            className="relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden focus:outline-none"
+            className="relative m-0 block h-full w-full cursor-pointer overflow-hidden border-0 bg-transparent p-0 focus:outline-none"
           >
             <video
               ref={videoRef}
-              src="/assets/aistudio/tmpklt33x_z_b7fc9c16.mp4"
+              src="/assets/aistudio/designarena-video_58f4997a.mp4"
               playsInline
               muted
               preload="auto"
               onTimeUpdate={handleTimeUpdate}
               onEnded={beginReveal}
-              className="h-full w-full object-cover object-center"
+              onError={beginReveal}
+              className="block h-full w-full object-cover object-center"
             />
           </button>
 
